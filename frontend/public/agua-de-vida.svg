@@ -1,0 +1,28 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#e0f2fe"/>
+    </linearGradient>
+    <linearGradient id="drop" x1="256" y1="86" x2="256" y2="408">
+      <stop offset="0%" stop-color="#67e8f9"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+    <linearGradient id="wave" x1="74" y1="330" x2="438" y2="384">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="100%" stop-color="#0ea5b7"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="0" y="0" width="512" height="512" rx="96" fill="url(#bg)"/>
+
+  <path d="M256 86C244 114 228 137 210 160C177 202 152 236 152 279C152 339 199 388 256 388C313 388 360 339 360 279C360 236 335 202 302 160C284 137 268 114 256 86Z" fill="url(#drop)"/>
+
+  <path d="M96 339C132 321 171 322 205 339C239 356 274 357 307 339C341 322 380 321 416 339V374H96V339Z" fill="url(#wave)"/>
+
+  <path d="M129 354C160 340 192 341 222 354C252 367 283 368 312 354C341 341 373 340 406 354" stroke="#e0f2fe" stroke-width="12" stroke-linecap="round"/>
+
+  <circle cx="228" cy="222" r="32" fill="#ecfeff" fill-opacity="0.55"/>
+
+  <text x="256" y="436" text-anchor="middle" font-family="Montserrat, sans-serif" font-size="44" font-weight="700" fill="#0f172a">Agua de Vida</text>
+</svg>
