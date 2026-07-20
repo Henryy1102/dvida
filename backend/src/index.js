@@ -24,9 +24,26 @@ import reviewRoutes from "./routes/review.routes.js";
 import { connectDB } from "./config/db.js";
 
 const app = express();
+
+// Configurar CORS para permitir tanto desarrollo como producción
+const allowedOrigins = [
+  'https://dvida.vercel.app',
+  'http://localhost:5173',
+  'http://localhost:3000'
+];
+
 app.use(cors({
-  origin: ['http://localhost:5173', 'https://licoreria-pasito.vercel.app'],
-  credentials: true
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('CORS no permitido'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  maxAge: 86400
 }));
 // Aumentar límites para permitir comprobantes grandes en Base64
 app.use(express.json({ limit: "50mb" }));
