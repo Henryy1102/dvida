@@ -98,9 +98,25 @@ const PORT = process.env.PORT || 4000;
 
 // Iniciar servidor solo cuando la DB esté conectada
 connectDB()
-  .then(() => {
-    app.listen(PORT, () => {
+  .then(async () => {
+    // Intentar arreglar índices problemáticos en la colección products antes de aceptar conexiones
+    try {
+      const { fixProductIndexes } = await import('./config/db.js');
+      await fixProductIndexes();
+    } catch (e) {
+      console.warn('No se pudo ejecutar fixProductIndexes:', e.message || e);
+    }
+
+    const server = app.listen(PORT, () => {
       console.log(`Servidor corriendo en puerto ${PORT}`);
+    });
+
+    server.on('error', (err) => {
+      console.error('Error al iniciar servidor:', err.message || err);
+      if (err.code === 'EADDRINUSE') {
+        console.error(`Puerto ${PORT} en uso. ¿Otro proceso ya está corriendo?`);
+      }
+      process.exit(1);
     });
   })
   .catch((err) => {
