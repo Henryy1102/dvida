@@ -53,6 +53,19 @@ app.use(cors({
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
+// Capturar errores de parseo JSON y responder con JSON claro
+app.use((err, req, res, next) => {
+  if (err && err.type === 'entity.parse.failed') {
+    console.warn('JSON parse error:', err.message);
+    return res.status(400).json({ message: 'JSON inválido en la petición' });
+  }
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    console.warn('SyntaxError parsing JSON:', err.message);
+    return res.status(400).json({ message: 'JSON inválido en la petición' });
+  }
+  next();
+});
+
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/clients", clientRoutes);
