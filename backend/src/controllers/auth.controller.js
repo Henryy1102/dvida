@@ -20,17 +20,23 @@ export const register = async (req, res) => {
     if (!password) missingFields.push('password');
     if (!fecha_nacimiento) missingFields.push('fecha_nacimiento');
     if (missingFields.length > 0) {
-      return res.status(400).json({ message: `Faltan campos requeridos: ${missingFields.join(', ')}` });
+      const msg = `Faltan campos requeridos: ${missingFields.join(', ')}`;
+      console.warn('Registro inválido:', msg, 'body-email:', email || 'N/A');
+      return res.status(400).json({ message: msg });
     }
 
     if (password.length < 6) {
-      return res.status(400).json({ message: 'La contraseña debe tener al menos 6 caracteres' });
+      const msg = 'La contraseña debe tener al menos 6 caracteres';
+      console.warn('Registro inválido:', msg, 'body-email:', email || 'N/A');
+      return res.status(400).json({ message: msg });
     }
 
     // Validar email simple
     const emailRegex = /\S+@\S+\.\S+/;
     if (!emailRegex.test(email)) {
-      return res.status(400).json({ message: 'El email no tiene un formato válido' });
+      const msg = 'El email no tiene un formato válido';
+      console.warn('Registro inválido:', msg, 'body-email:', email || 'N/A');
+      return res.status(400).json({ message: msg });
     }
 
     // Validar teléfono si viene presente
@@ -38,7 +44,9 @@ export const register = async (req, res) => {
       const telClean = telefono.replace(/\s+/g, '');
       const telRegex = /^\+?\d{7,15}$/;
       if (!telRegex.test(telClean)) {
-        return res.status(400).json({ message: 'El teléfono no es válido. Use solo dígitos y opcionalmente prefijo +, entre 7 y 15 caracteres.' });
+        const msg = 'El teléfono no es válido. Use solo dígitos y opcionalmente prefijo +, entre 7 y 15 caracteres.';
+        console.warn('Registro inválido:', msg, 'body-email:', email || 'N/A', 'telefono:', telefono);
+        return res.status(400).json({ message: msg });
       }
     }
 
@@ -60,7 +68,9 @@ export const register = async (req, res) => {
 
     const birthDate = parseDateString(fecha_nacimiento);
     if (!birthDate || isNaN(birthDate.getTime())) {
-      return res.status(400).json({ message: 'La fecha de nacimiento no tiene un formato válido. Use AAAA-MM-DD o DD/MM/AAAA.' });
+      const msg = 'La fecha de nacimiento no tiene un formato válido. Use AAAA-MM-DD o DD/MM/AAAA.';
+      console.warn('Registro inválido:', msg, 'body-email:', email || 'N/A', 'raw-fecha:', fecha_nacimiento);
+      return res.status(400).json({ message: msg });
     }
 
     // Validar edad mínima 18 años
@@ -71,7 +81,9 @@ export const register = async (req, res) => {
       age--;
     }
     if (age < 18) {
-      return res.status(400).json({ message: 'Debes ser mayor de 18 años para registrarte' });
+      const msg = 'Debes ser mayor de 18 años para registrarte';
+      console.warn('Registro inválido:', msg, 'body-email:', email || 'N/A', 'birthDate:', birthDate);
+      return res.status(400).json({ message: msg });
     }
 
     const userExist = await User.findOne({ email });

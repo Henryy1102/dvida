@@ -30,8 +30,31 @@ export default function Register() {
       return;
     }
 
+    // Normalizar datos antes de enviar
+    const normalizePhone = (tel) => (tel ? tel.replace(/\s+/g, '') : '');
+    const normalizeDate = (dateStr) => {
+      if (!dateStr) return '';
+      // Si viene como dd/mm/yyyy -> convertir a yyyy-mm-dd
+      if (dateStr.includes('/')) {
+        const parts = dateStr.split('/');
+        if (parts.length === 3) {
+          const [d, m, y] = parts;
+          return `${y.padStart(4, '0')}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+        }
+      }
+      // Si viene en formato Date-like (yyyy-mm-dd) devolver tal cual
+      return dateStr;
+    };
+
     try {
-      await register({ nombre, email, telefono, fecha_nacimiento, password });
+      const payload = {
+        nombre,
+        email,
+        telefono: normalizePhone(telefono),
+        fecha_nacimiento: normalizeDate(fecha_nacimiento),
+        password,
+      };
+      await register(payload);
       navigate("/catalog");
     } catch (err) {
       console.error("Error al registrar:", err);
