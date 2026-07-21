@@ -283,7 +283,7 @@ export default function Catalog() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
           <div>
             <h3 className="font-semibold text-base sm:text-lg text-textMain mb-3">Ubicación</h3>
-            <p className="text-xs sm:text-sm text-subtext">Av. Principal Leonidas Plaza</p>
+            <p className="text-xs sm:text-sm text-subtext">aguadevida@gmail.com</p>
             <p className="text-xs sm:text-sm text-subtext">Riobamba, Ecuador</p>
           </div>
           
@@ -296,7 +296,7 @@ export default function Catalog() {
           <div>
             <h3 className="font-semibold text-base sm:text-lg text-textMain mb-3">Contacto</h3>
             <p className="text-xs sm:text-sm text-subtext">WhatsApp: +593 99 550 8392</p>
-            <p className="text-xs sm:text-sm text-subtext break-all">Email: janethchavez@gmail.com</p>
+            <p className="text-xs sm:text-sm text-subtext break-all">aguadevida@gmail.com</p>
           </div>
           
           <div>

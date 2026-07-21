@@ -17,9 +17,13 @@ const auditSchema = new mongoose.Schema({
       "LOGIN",
       "LOGOUT",
       "REGISTRO",
+      // Mantener compatibilidad: incluir variantes usadas en controladores
       "PRODUCTO_CREADO",
       "PRODUCTO_EDITADO",
       "PRODUCTO_ELIMINADO",
+      "CREAR_PRODUCTO",
+      "ACTUALIZAR_PRODUCTO",
+      "ELIMINAR_PRODUCTO",
       "CLIENTE_CREADO",
       "CLIENTE_EDITADO",
       "CLIENTE_ELIMINADO",
