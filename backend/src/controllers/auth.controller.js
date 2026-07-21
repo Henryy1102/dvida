@@ -264,8 +264,14 @@ export const register = async (req, res) => {
     console.error("Error al registrar usuario:", error);
     // Errores comunes: clave duplicada (email), validaciones, JWT secret faltante
     if (error?.code === 11000 || error?.name === "MongoServerError") {
-      // intentar obtener el campo duplicado
-      const duplicatedField = error?.keyValue ? Object.keys(error.keyValue).join(', ') : 'email';
+      // intentar obtener el campo duplicado y mapear a mensaje legible
+      let duplicatedField = 'datos';
+      if (error?.keyValue) {
+        const key = Object.keys(error.keyValue)[0];
+        if (key && /email/i.test(key)) duplicatedField = 'email';
+        else if (key && /ident|numeroIdentificacion|nit|dui/i.test(key)) duplicatedField = 'identificación';
+        else duplicatedField = key;
+      }
       return res.status(400).json({ message: `El usuario ya existe (${duplicatedField})` });
     }
     if (error?.name === "ValidationError") {
