@@ -26,11 +26,15 @@ import { connectDB } from "./config/db.js";
 const app = express();
 
 // Configurar CORS para permitir tanto desarrollo como producción
-const allowedOrigins = [
-  'https://dvida.vercel.app',
-  'http://localhost:5173',
-  'http://localhost:3000'
-];
+// Permitir configurar orígenes vía variable de entorno `ALLOWED_ORIGINS`
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(",").map((s) => s.trim())
+  : [
+      'https://dvida.vercel.app',
+      'https://dvida.onrender.com',
+      'http://localhost:5173',
+      'http://localhost:3000',
+    ];
 
 app.use(cors({
   origin: function (origin, callback) {

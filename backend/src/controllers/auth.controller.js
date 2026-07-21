@@ -13,17 +13,57 @@ export const register = async (req, res) => {
   try {
     const { nombre, email, password, telefono, fecha_nacimiento } = req.body;
 
-    // Validaciones
-    if (!nombre || !email || !password || !fecha_nacimiento) {
-      return res.status(400).json({ message: "Todos los campos son requeridos" });
+    // Validaciones básicas por campo con mensajes específicos
+    const missingFields = [];
+    if (!nombre) missingFields.push('nombre');
+    if (!email) missingFields.push('email');
+    if (!password) missingFields.push('password');
+    if (!fecha_nacimiento) missingFields.push('fecha_nacimiento');
+    if (missingFields.length > 0) {
+      return res.status(400).json({ message: `Faltan campos requeridos: ${missingFields.join(', ')}` });
     }
 
     if (password.length < 6) {
-      return res.status(400).json({ message: "La contraseña debe tener al menos 6 caracteres" });
+      return res.status(400).json({ message: 'La contraseña debe tener al menos 6 caracteres' });
+    }
+
+    // Validar email simple
+    const emailRegex = /\S+@\S+\.\S+/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ message: 'El email no tiene un formato válido' });
+    }
+
+    // Validar teléfono si viene presente
+    if (telefono) {
+      const telClean = telefono.replace(/\s+/g, '');
+      const telRegex = /^\+?\d{7,15}$/;
+      if (!telRegex.test(telClean)) {
+        return res.status(400).json({ message: 'El teléfono no es válido. Use solo dígitos y opcionalmente prefijo +, entre 7 y 15 caracteres.' });
+      }
+    }
+
+    // Intentar parsear fecha de nacimiento en varios formatos
+    const parseDateString = (str) => {
+      if (!str) return null;
+      // Si viene como dd/mm/yyyy
+      if (str.includes('/')) {
+        const parts = str.split('/');
+        if (parts.length === 3) {
+          // asumir dd/mm/yyyy
+          const [d, m, y] = parts;
+          return new Date(`${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`);
+        }
+      }
+      // fallback: Date constructor
+      return new Date(str);
+    };
+
+    const birthDate = parseDateString(fecha_nacimiento);
+    if (!birthDate || isNaN(birthDate.getTime())) {
+      return res.status(400).json({ message: 'La fecha de nacimiento no tiene un formato válido. Use AAAA-MM-DD o DD/MM/AAAA.' });
     }
 
     // Validar edad mínima 18 años
-    const birthDate = new Date(fecha_nacimiento);
     const today = new Date();
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
@@ -31,7 +71,7 @@ export const register = async (req, res) => {
       age--;
     }
     if (age < 18) {
-      return res.status(400).json({ message: "Debes ser mayor de 18 años para registrarte" });
+      return res.status(400).json({ message: 'Debes ser mayor de 18 años para registrarte' });
     }
 
     const userExist = await User.findOne({ email });
@@ -212,15 +252,21 @@ export const register = async (req, res) => {
     console.error("Error al registrar usuario:", error);
     // Errores comunes: clave duplicada (email), validaciones, JWT secret faltante
     if (error?.code === 11000 || error?.name === "MongoServerError") {
-      return res.status(400).json({ message: "El usuario ya existe" });
+      // intentar obtener el campo duplicado
+      const duplicatedField = error?.keyValue ? Object.keys(error.keyValue).join(', ') : 'email';
+      return res.status(400).json({ message: `El usuario ya existe (${duplicatedField})` });
     }
     if (error?.name === "ValidationError") {
-      return res.status(400).json({ message: "Datos inválidos de usuario" });
+      // recolectar mensajes de validación si existen
+      const messages = Object.values(error.errors || {}).map((e) => e.message).join('; ');
+      return res.status(400).json({ message: messages || 'Datos inválidos de usuario' });
     }
     if (!process.env.JWT_SECRET) {
-      return res.status(500).json({ message: "Configuración del servidor incompleta (JWT_SECRET)" });
+      return res.status(500).json({ message: 'Configuración del servidor incompleta (JWT_SECRET)' });
     }
-    res.status(500).json({ message: "Error al registrar usuario" });
+    // Si el error tiene mensaje legible, devolverlo; si no, enviar mensaje genérico
+    const msg = error?.message || 'Error al registrar usuario';
+    return res.status(500).json({ message: msg });
   }
 };
 
