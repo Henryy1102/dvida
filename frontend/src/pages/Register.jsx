@@ -6,6 +6,7 @@ export default function Register() {
   const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
   const [telefono, setTelefono] = useState("");
+  const [identificacion, setIdentificacion] = useState("");
   const [fecha_nacimiento, setFechaNacimiento] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -18,7 +19,7 @@ export default function Register() {
     e.preventDefault();
     clearError();
 
-    if (!nombre || !email || !fecha_nacimiento || !password || !confirmPassword) {
+    if (!nombre || !email || !identificacion || !fecha_nacimiento || !password || !confirmPassword) {
       return;
     }
 
@@ -50,6 +51,7 @@ export default function Register() {
       const payload = {
         nombre,
         email,
+        identification: identificacion.trim(),
         telefono: normalizePhone(telefono),
         fecha_nacimiento: normalizeDate(fecha_nacimiento),
         password,
@@ -119,6 +121,21 @@ export default function Register() {
               value={telefono}
               onChange={(e) => setTelefono(e.target.value)}
               disabled={loading}
+            />
+          </div>
+
+          <div className="mb-3 sm:mb-4">
+            <label className="block font-bold mb-2 text-sm sm:text-base" style={{color: '#000000'}}>
+              Identificación *
+            </label>
+            <input
+              type="text"
+              className="input"
+              placeholder="NIT o DUI"
+              value={identificacion}
+              onChange={(e) => setIdentificacion(e.target.value)}
+              disabled={loading}
+              required
             />
           </div>
 

@@ -23,6 +23,12 @@ const userSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
+    identification: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+    },
     // Campos fiscales para facturación
     nit: {
       type: String,

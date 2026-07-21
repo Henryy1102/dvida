@@ -11,12 +11,14 @@ import { generarXMLFactura } from "../utils/xmlGenerator.js";
 
 export const register = async (req, res) => {
   try {
-    const { nombre, email, password, telefono, fecha_nacimiento } = req.body;
+    const { nombre, email, password, telefono, fecha_nacimiento, identification } = req.body;
+    const normalizedIdentification = identification?.trim() || "";
 
     // Validaciones básicas por campo con mensajes específicos
     const missingFields = [];
     if (!nombre) missingFields.push('nombre');
     if (!email) missingFields.push('email');
+    if (!normalizedIdentification) missingFields.push('identification');
     if (!password) missingFields.push('password');
     if (!fecha_nacimiento) missingFields.push('fecha_nacimiento');
     if (missingFields.length > 0) {
@@ -86,9 +88,11 @@ export const register = async (req, res) => {
       return res.status(400).json({ message: msg });
     }
 
-    const userExist = await User.findOne({ email });
-    if (userExist)
-      return res.status(400).json({ message: "El usuario ya existe" });
+    const userExist = await User.findOne({ $or: [{ email }, { identification: normalizedIdentification }] });
+    if (userExist) {
+      const duplicatedField = userExist.email === email ? 'email' : 'identificación';
+      return res.status(400).json({ message: `El usuario ya existe (${duplicatedField})` });
+    }
 
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(password, salt);
@@ -96,9 +100,18 @@ export const register = async (req, res) => {
     const user = await User.create({
       nombre,
       email,
+      identification: normalizedIdentification,
       password: hash,
       telefono: telefono || "",
       fecha_nacimiento: birthDate,
+      datosFacturacion: {
+        tipoIdentificacion: "",
+        numeroIdentificacion: normalizedIdentification,
+        razonSocial: "",
+        direccion: "",
+        telefono: "",
+        correo: "",
+      },
     });
 
     const token = jwt.sign(
