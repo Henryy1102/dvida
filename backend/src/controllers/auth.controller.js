@@ -272,7 +272,12 @@ export const register = async (req, res) => {
         else if (key && /ident|numeroIdentificacion|nit|dui/i.test(key)) duplicatedField = 'identificación';
         else duplicatedField = key;
       }
-      return res.status(400).json({ message: `El usuario ya existe (${duplicatedField})` });
+      // Incluir detalles del error para diagnóstico (se puede remover después)
+      return res.status(400).json({
+        message: `El usuario ya existe (${duplicatedField})`,
+        duplicatedField,
+        detail: error?.keyValue || null,
+      });
     }
     if (error?.name === "ValidationError") {
       // recolectar mensajes de validación si existen

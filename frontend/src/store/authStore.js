@@ -21,6 +21,8 @@ export const useAuthStore = create((set) => ({
       return data;
     } catch (error) {
       const errorMessage = error.response?.data?.message || "Error al iniciar sesión";
+      // Log full server response for debugging
+      console.error('Login error response data:', error.response?.data || error.message);
       set({ error: errorMessage, loading: false });
       throw error;
     }
@@ -39,6 +41,7 @@ export const useAuthStore = create((set) => ({
       return data;
     } catch (error) {
       const errorMessage = error.response?.data?.message || "Error al registrar usuario";
+      console.error('Register error response data:', error.response?.data || error.message);
       set({ error: errorMessage, loading: false });
       throw error;
     }
