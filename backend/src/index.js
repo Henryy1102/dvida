@@ -66,6 +66,21 @@ app.use("/api/reports", reportRoutes);
 app.use("/api/invoices", invoiceRoutes);
 app.use("/api/reviews", reviewRoutes);
 
+// Ruta raíz y healthcheck para evitar 404 crípticos en la raíz del dominio
+app.get("/", (req, res) => {
+  res.status(200).send("API d'vida: backend activo. Usa /api para endpoints.");
+});
+
+// Health endpoint para monitoreo
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok', uptime: process.uptime() });
+});
+
+// Handler para rutas no encontradas (API)
+app.use((req, res) => {
+  res.status(404).json({ message: 'Recurso no encontrado' });
+});
+
 const PORT = process.env.PORT || 4000;
 
 // Iniciar servidor solo cuando la DB esté conectada
